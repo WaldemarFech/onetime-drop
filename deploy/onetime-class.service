@@ -1,0 +1,43 @@
+[Unit]
+Description=OneTime Drop Class service
+Documentation=man:systemd.exec(5)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=onetime-class
+Group=onetime-class
+WorkingDirectory=/opt/onetime-drop
+ExecStart=/usr/bin/python3 -m onetime_drop.classdrop.server --config /etc/onetime-class/class.toml
+Restart=on-failure
+RestartSec=5
+UMask=0077
+
+# Sandboxing (mirrors deploy/onetime-dil.service hardening)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+ProtectProc=invisible
+ProcSubset=pid
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RemoveIPC=true
+PrivateUsers=false
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+ReadWritePaths=/var/lib/onetime-class
+ReadOnlyPaths=/etc/onetime-class
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+/var/lib/onetime-drop/audit.log {
+    weekly
+    rotate 12
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0600 onetime-drop onetime-drop
+    su onetime-drop onetime-drop
+}

@@ -1,0 +1,10 @@
+# Authelia configuration.yml -> access_control.rules (put above broader rules).
+access_control:
+  rules:
+    - domain: drop.example.com
+      subject:
+        - user:alice
+        - user:bob
+      policy: two_factor
+    - domain: drop.example.com
+      policy: deny

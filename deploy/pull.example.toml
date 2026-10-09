@@ -1,0 +1,10 @@
+# Config for tools/pull_inputs.py on the machine that should receive input submissions.
+# remote_command runs the onetime-drop CLI on the service host; "outbox list|get|rm" is appended.
+# The wrapper must run as root (it switches to the service user via runuser) or as onetime-drop.
+# As root:      ["ssh", "root@drop-host", "/usr/local/bin/onetime-drop"]
+# Via sudo:     ["ssh", "admin@drop-host", "sudo", "-n", "/usr/local/bin/onetime-drop"]
+#               (sudoers: admin ALL=(root) NOPASSWD: /usr/local/bin/onetime-drop)
+remote_command = ["ssh", "root@drop-host", "/usr/local/bin/onetime-drop"]
+target_dir = "~/secrets/inbox"
+format = "markdown"            # or "json"
+restrict_permissions = true    # chmod 600 / icacls owner-only before content is written

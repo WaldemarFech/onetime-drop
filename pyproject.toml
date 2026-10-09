@@ -1,0 +1,20 @@
+[project]
+name = "onetime-drop"
+version = "1.2.0"
+description = "Self-hosted one-time reveal AND input links behind Traefik/Authelia or any forward-auth proxy"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+dependencies = ["cryptography>=41"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+onetime-drop = "onetime_drop.cli:main"
+
+[tool.setuptools]
+packages = ["onetime_drop"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

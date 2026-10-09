@@ -1,0 +1,15 @@
+# /etc/onetime-class/class.toml - class drop-in + gallery (onetime_drop.classdrop). No secrets here.
+state_dir = "/var/lib/onetime-class"
+key_file = "/etc/onetime-class/key.bin"     # 32 random bytes, created by install-class.sh
+base_url = "https://drop.example.com"
+bind = "192.0.2.31"                        # private address, reachable only by the reverse proxy
+port = 8082
+trusted_proxies = ["192.0.2.3"]            # only these peers are served; client IP = last X-Forwarded-For
+admin_users = ["owner"]                    # Remote-User values (Authelia 2FA) allowed on /admin/klassen
+max_file_mb = 25
+max_files = 20                             # per upload
+max_request_mb = 60
+default_class_mb = 2048
+per_ip_per_min = 60
+global_per_min = 1200
+max_connections = 64

@@ -1,0 +1,30 @@
+[Unit]
+Description=onetime-drop one-time reveal/input links
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=onetime-drop
+Group=onetime-drop
+Environment=ONETIME_DROP_CONFIG=/etc/onetime-drop/config.toml
+Environment=PYTHONPATH=/opt/onetime-drop
+ExecStart=/usr/bin/python3 -m onetime_drop serve
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/onetime-drop
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

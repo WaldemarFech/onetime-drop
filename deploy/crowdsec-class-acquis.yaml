@@ -1,0 +1,7 @@
+# CrowdSec acquisition for onetime-class.service (CT 100031)
+# Log line (stderr/journald): 'classdrop event=<bad-password|locked|rate-limited|denied-peer> ip=<client ip>'
+source: journalctl
+journalctl_filter:
+  - "_SYSTEMD_UNIT=onetime-class.service"
+labels:
+  type: classdrop

@@ -1,0 +1,43 @@
+[Unit]
+Description=onetime-drop DIL-lite public passphrase download links (no SSO)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=onetime-dil
+Group=onetime-dil
+Environment=ONETIME_DIL_CONFIG=/etc/onetime-dil/dil.toml
+Environment=PYTHONPATH=/opt/onetime-dil
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m onetime_drop.dil dil-serve
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/onetime-dil
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
+AmbientCapabilities=
+MemoryMax=512M
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

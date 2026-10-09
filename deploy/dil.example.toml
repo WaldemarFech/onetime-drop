@@ -1,0 +1,11 @@
+# /etc/onetime-dil/dil.toml (root:onetime-dil 0640) - DIL-lite public download links
+state_dir = "/var/lib/onetime-dil"
+base_url = "https://dil.example.com"
+bind = "192.0.2.29"            # private address, reachable only by the reverse proxy
+port = 8081
+trusted_proxies = ["192.0.2.3"] # only these peers are served; client IP = last X-Forwarded-For
+max_ttl = "48h"
+per_ip_per_min = 20
+global_per_min = 600
+max_connections = 64
+lang = "de"

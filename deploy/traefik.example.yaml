@@ -1,0 +1,45 @@
+# Traefik dynamic config (file provider). Order matters:
+#  1. scrub client-supplied identity/proof headers (so nobody can forge Remote-User)
+#  2. forward-auth (Authelia here; any forward-auth server that sets Remote-User works)
+#  3. strip the session cookie and add the shared backend secret
+http:
+  routers:
+    drop:
+      rule: "Host(`drop.example.com`)"
+      entryPoints: [websecure]
+      service: drop
+      middlewares: [drop-hsts, drop-scrub, drop-auth, drop-proof]   # hsts first: also covers auth redirects
+      observability:
+        accessLogs: false   # URLs contain one-time tokens (Traefik >= 3.4)
+      tls:
+        certResolver: letsencrypt
+  middlewares:
+    drop-scrub:
+      headers:
+        customRequestHeaders:
+          Remote-User: ""
+          Remote-Groups: ""
+          Remote-Email: ""
+          Remote-Name: ""
+          X-Forwarded-User: ""
+          X-Drop-Proxy-Secret: ""
+    drop-auth:
+      forwardAuth:
+        address: "http://10.0.0.4:9091/api/authz/forward-auth"
+        trustForwardHeader: false
+        authResponseHeaders: ["Remote-User"]
+    drop-proof:
+      headers:
+        customRequestHeaders:
+          Cookie: ""
+          Authorization: ""
+          X-Drop-Proxy-Secret: "REPLACE_WITH_CONTENT_OF_/etc/onetime-drop/proxy_secret"
+    drop-hsts:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: false
+  services:
+    drop:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.0.20:8080"

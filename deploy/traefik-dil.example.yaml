@@ -1,0 +1,40 @@
+# Public DIL router: NO forward-auth. Protection = token + passphrase (3 tries) + TTL + caps,
+# Traefik rate limit + in-flight cap, CrowdSec bouncer (entrypoint-wide) + local/dil-abuse scenario.
+# Access log stays ON for this router so CrowdSec can see 403/404/429 bursts (see README).
+http:
+  routers:
+    dil:
+      rule: "Host(`dil.example.com`)"
+      entryPoints: [websecure]
+      service: dil-web
+      middlewares: [dil-hsts, dil-ratelimit, dil-inflight, dil-scrub]
+      tls:
+        certResolver: letsencrypt
+  middlewares:
+    dil-hsts:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: false
+    dil-ratelimit:
+      rateLimit:
+        average: 30
+        period: 1m
+        burst: 15
+    dil-inflight:
+      inFlightReq:
+        amount: 4
+        sourceCriterion:      # per client IP (the default would be one shared pool per host)
+          ipStrategy:
+            depth: 0
+    dil-scrub:
+      headers:
+        customRequestHeaders:
+          Remote-User: ""
+          Remote-Groups: ""
+          X-Drop-Proxy-Secret: ""
+  services:
+    dil-web:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://192.0.2.29:8081

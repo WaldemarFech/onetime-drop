@@ -1,0 +1,42 @@
+# Traefik dynamic config: class drop-in + gallery on the existing drop host (see docs/CLASSDROP.md).
+# Public routes (no SSO) match ONLY the strict path shapes; /admin/klassen goes through Authelia 2FA.
+# Reuses drop-hsts / drop-identity-scrub / drop-backend-proof from drop.yaml (same file provider).
+# Client IP: Traefik appends the peer to X-Forwarded-For; the app trusts only the proxy and reads the last hop.
+http:
+  routers:
+    class-public:
+      rule: "Host(`drop.example.com`) && (PathRegexp(`^/[a-z0-9]{3}(/(unlock|upload))?$`) || PathRegexp(`^/g/[a-z0-9-]{3,24}(/(unlock|[ft]/[0-9a-f]{16}))?$`))"
+      priority: 1000
+      entryPoints: [websecure]
+      service: class-web
+      middlewares: [drop-hsts, drop-identity-scrub, class-ratelimit, class-body]
+      observability:
+        accessLogs: false   # gallery URLs carry tokens
+      tls:
+        certResolver: letsencrypt
+    class-admin:
+      rule: "Host(`drop.example.com`) && PathPrefix(`/admin/klassen`)"
+      priority: 1000
+      entryPoints: [websecure]
+      service: class-web
+      middlewares: [drop-hsts, drop-identity-scrub, hive-forward-auth@file, drop-backend-proof, class-body]
+      observability:
+        accessLogs: false
+      tls:
+        certResolver: letsencrypt
+  middlewares:
+    class-ratelimit:
+      rateLimit:
+        average: 60
+        period: 1m
+        burst: 30
+    class-body:
+      buffering:
+        maxRequestBodyBytes: 62914560   # 60 MB = max_request_mb
+        memRequestBodyBytes: 2097152
+  services:
+    class-web:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://192.0.2.31:8082

@@ -1,0 +1,19 @@
+# /etc/crowdsec/scenarios/dil-abuse.yaml - ban sources hammering the public DIL host with
+# 403 (wrong passphrase), 404 (unknown/burned token, probing) or 429 (rate limited).
+type: leaky
+name: local/dil-abuse
+description: "Repeated 403/404/429 against the public DIL download host"
+filter: "evt.Meta.service == 'http' && evt.Meta.target_fqdn == 'dil.example.com' && evt.Meta.http_status in ['403', '404', '429'] && evt.Parsed.static_ressource == 'false'"
+groupby: "evt.Meta.source_ip"
+capacity: 8
+leakspeed: "30s"
+blackhole: 5m
+labels:
+  remediation: true
+  service: http
+  behavior: "http:bruteforce"
+  label: "DIL link abuse"
+  confidence: 3
+  spoofable: 0
+  classification:
+    - attack.T1110

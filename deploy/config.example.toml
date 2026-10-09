@@ -1,0 +1,19 @@
+# /etc/onetime-drop/config.toml  (mode 640 root:onetime-drop)
+base_url = "https://drop.example.com"     # public URL used in generated links
+bind = "10.0.0.20"                        # listen only on the internal interface
+port = 8080
+data_dir = "/var/lib/onetime-drop"        # items, outbox, audit.log (mode 700)
+key_file = "/etc/onetime-drop/key"        # 32 random bytes, mode 600, AES-256-GCM at rest
+proxy_secret_file = "/etc/onetime-drop/proxy_secret"   # shared with the reverse proxy
+allowed_proxies = ["10.0.0.3"]            # source IP(s) of the reverse proxy
+user_header = "Remote-User"               # set by the forward-auth server (Authelia, ...)
+proxy_secret_header = "X-Drop-Proxy-Secret"
+allowed_users = ["alice", "bob"]          # may open links
+admin_users = ["alice"]                   # may use /admin (subset of allowed_users)
+default_ttl = "24h"
+max_ttl = "7d"                            # hard cap is 7d
+lang = "en"                               # "en" or "de"
+# action links (README "Action links"); default: no network allowed
+action_networks = ["10.0.0.0/24"]      # hosts recipes may target
+action_timeout = 60                       # seconds, hard cap per run (max 300)
+# ssh_command = ["/usr/bin/ssh"]

@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.egg-info/
+build/
+dist/
+# never commit runtime state or keys
+/data/
+*.key
+proxy_secret
+config.toml
+pull.toml
+!deploy/*.example.toml
